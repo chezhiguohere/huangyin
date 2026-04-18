@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小寅集市 — 校园二手交易</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf9f6;
+  --bg2:#ffffff;
+  --bg3:#f2f0eb;
+  --border:#e8e4dc;
+  --text:#1c1a15;
+  --muted:#9a9280;
+  --primary:#d4820a;
+  --primary-light:#fef3e0;
+  --green:#2dbe8c;
+  --green-light:#e6f9f3;
+  --blue:#4a90e2;
+  --blue-light:#eef4fd;
+  --purple:#9b59b6;
+  --purple-light:#f3eaf8;
+  --yellow:#f7c948;
+  --yellow-light:#fef9e7;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:420px;margin:0 auto;position:relative}
+/* Header */
+.header{background:var(--bg2);padding:18px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-mark{width:34px;height:34px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-name{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.3px}
+.logo-name span{color:var(--primary)}
+.header-right{display:flex;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:10px;background:var(--bg3);border:none;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;position:relative;transition:background 0.12s}
+.icon-btn:hover{background:var(--border)}
+.badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--primary);border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+/* Search */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:12px;padding:9px 14px;border:1.5px solid transparent;transition:border-color 0.15s}
+.search-bar:focus-within{border-color:var(--primary);background:#fff}
+.search-bar input{flex:1;border:none;background:transparent;font-size:14px;font-family:'Nunito',sans-serif;color:var(--text);outline:none}
+.search-bar input::placeholder{color:var(--muted)}
+/* Categories */
+.cats{padding:16px 20px 4px;overflow-x:auto;display:flex;gap:8px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;flex-shrink:0}
+.cat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform 0.15s}
+.cat:hover .cat-icon{transform:scale(1.08)}
+.cat.active .cat-icon{border:2.5px solid var(--primary)}
+.cat-name{font-size:10px;font-weight:600;color:var(--muted)}
+.cat.active .cat-name{color:var(--primary)}
+/* Banner */
+.banner{margin:12px 20px;background:linear-gradient(135deg,var(--primary) 0%,#ff8f65 100%);border-radius:16px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;position:relative}
+.banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,0.1);border-radius:50%}
+.banner::after{content:'';position:absolute;right:20px;bottom:-30px;width:80px;height:80px;background:rgba(255,255,255,0.08);border-radius:50%}
+.banner-text{position:relative;z-index:1}
+.banner-tag{font-size:10px;font-weight:700;background:rgba(255,255,255,0.25);color:#fff;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;letter-spacing:0.5px}
+.banner-title{font-size:18px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px}
+.banner-sub{font-size:11px;color:rgba(255,255,255,0.8)}
+.banner-btn{position:relative;z-index:1;background:#fff;color:var(--primary);border:none;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap}
+/* Section */
+.section{padding:16px 20px 8px}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:15px;font-weight:800;color:var(--text)}
+.sec-more{font-size:12px;color:var(--primary);font-weight:600;cursor:pointer}
+/* Cards grid */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item-card{background:var(--bg2);border-radius:14px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform 0.15s,box-shadow 0.15s}
+.item-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+.item-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.item-condition{position:absolute;top:8px;left:8px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:6px}
+.cond-good{background:var(--green-light);color:#1a8a62}
+.cond-new{background:var(--blue-light);color:#2a6db5}
+.cond-fair{background:var(--yellow-light);color:#c49a00}
+.item-fav{position:absolute;top:8px;right:8px;width:26px;height:26px;background:rgba(255,255,255,0.9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;border:none}
+.item-info{padding:10px 12px 12px}
+.item-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{display:flex;align-items:center;justify-content:space-between}
+.item-price{font-size:16px;font-weight:800;color:var(--primary)}
+.item-price span{font-size:11px;font-weight:600}
+.item-seller{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.seller-dot{width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff}
+/* Hot list */
+.hot-list{display:flex;flex-direction:column;gap:8px}
+.hot-item{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.12s}
+.hot-item:hover{border-color:var(--primary);background:var(--primary-light)}
+.hot-rank{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.rank-1{background:var(--primary);color:#fff}
+.rank-2{background:#c8760a;color:#fff}
+.rank-3{background:var(--yellow);color:#7a5f00}
+.rank-n{background:var(--bg3);color:var(--muted)}
+.hot-icon{font-size:24px;flex-shrink:0}
+.hot-meta{flex:1;min-width:0}
+.hot-name{font-size:13px;font-weight:700;color:var(--text)}
+.hot-info{font-size:10px;color:var(--muted);margin-top:1px}
+.hot-price{font-size:14px;font-weight:800;color:var(--primary);flex-shrink:0}
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding:8px 0 20px}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'Nunito',sans-serif}
+.nav-icon{font-size:20px;line-height:1}
+.nav-label{font-size:9px;font-weight:700;color:var(--muted)}
+.nav-btn.active .nav-label{color:var(--primary)}
+.nav-btn.active .nav-icon{filter:none}
+.post-btn{width:44px;height:44px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;margin-top:-12px;box-shadow:0 4px 14px rgba(212,130,10,0.4);cursor:pointer;border:none;font-family:'Nunito',sans-serif}
+.spacer{height:80px}
+@keyframes pop{0%{transform:scale(0.92);opacity:0}100%{transform:scale(1);opacity:1}}
+.item-card{animation:pop 0.3s ease both}
+.item-card:nth-child(1){animation-delay:0.05s}
+.item-card:nth-child(2){animation-delay:0.1s}
+.item-card:nth-child(3){animation-delay:0.15s}
+.item-card:nth-child(4){animation-delay:0.2s}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-mark">🐯</div>
+      <div class="logo-name">小<span>寅</span></div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn">🔔<div class="badge">3</div></button>
+      <button class="icon-btn">💬<div class="badge">7</div></button>
+    </div>
+  </div>
+  <div class="search-bar">
+    <span style="font-size:15px">🔍</span>
+    <input type="text" placeholder="搜索教材、数码、好物...寅时上新 🐯">
+  </div>
+</div>
+<!-- Categories -->
+<div class="cats">
+  <div class="cat active"><div class="cat-icon" style="background:#fff0eb">📚</div><div class="cat-name">教材</div></div>
+  <div class="cat"><div class="cat-icon" style="background:#eef4fd">💻</div><div class="cat-name">数码</div></div>
+  <div class="cat"><div class="cat-icon" style="background:#e6f9f3">🧥</div><div class="cat-name">衣物</div></div>
+  <div class="cat"><div class="cat-icon" style="background:#fef9e7">🎮</div><div class="cat-name">娱乐</div></div>
+  <div class="cat"><div class="cat-icon" style="background:#f3eaf8">🚲</div><div class="cat-name">出行</div></div>
+  <div class="cat"><div class="cat-icon" style="background:#fff0eb">🍳</div><div class="cat-name">生活</div></div>
+  <div class="cat"><div class="cat-icon" style="background:#eef4fd">🎨</div><div class="cat-name">文创</div></div>
+</div>
+<!-- Banner -->
+<div class="banner">
+  <div class="banner-text">
+    <div class="banner-tag">🐯 小寅特卖</div>
+    <div class="banner-title">寅时上新<br>好物捡漏</div>
+    <div class="banner-sub">每天早 3-5 点 · 虎气冲天好价格</div>
+  </div>
+  <button class="banner-btn">立即抢购 →</button>
+</div>
+<!-- Recommend -->
+<div class="section">
+  <div class="sec-header">
+    <div class="sec-title">🔥 精选好物</div>
+    <div class="sec-more">更多 →</div>
+  </div>
+  <div class="cards-grid" id="items"></div>
+</div>
+<!-- Hot -->
+<div class="section">
+  <div class="sec-header">
+    <div class="sec-title">⚡ 热度榜</div>
+    <div class="sec-more">查看全榜</div>
+  </div>
+  <div class="hot-list" id="hot"></div>
+</div>
+<div class="spacer"></div>
+<div class="bottom-nav">
+  <button class="nav-btn active"><div class="nav-icon">🏠</div><div class="nav-label">首页</div></button>
+  <button class="nav-btn"><div class="nav-icon">🔍</div><div class="nav-label">发现</div></button>
+  <button class="post-btn" onclick="alert('🐯 小寅集市 · 发布商品\n（产品原型展示 · 设计：黄寅）')">＋</button>
+  <button class="nav-btn"><div class="nav-icon">💼</div><div class="nav-label">我卖的</div></button>
+  <button class="nav-btn"><div class="nav-icon">👤</div><div class="nav-label">我的</div></button>
+</div>
+<script>
+const items=[
+  {emoji:'📗',bg:'#e8f5e9',name:'高数教材(同济版7)',price:'18',orig:'85',cond:'九成新',condClass:'cond-good',seller:'小明同学',sellerColor:'#2dbe8c'},
+  {emoji:'🎧',bg:'#e3f2fd',name:'索尼 WH-1000XM4',price:'680',orig:'2299',cond:'9成新',condClass:'cond-new',seller:'音乐系学姐',sellerColor:'#4a90e2'},
+  {emoji:'💻',bg:'#f3e5f5',name:'iPad Pro 11寸 2022',price:'3200',orig:'6999',cond:'9成新',condClass:'cond-new',seller:'工科小李',sellerColor:'#9b59b6'},
+  {emoji:'🧥',bg:'#fff8e1',name:'优衣库羽绒服 L码',price:'88',orig:'399',cond:'8成新',condClass:'cond-fair',seller:'设计系同学',sellerColor:'#f7c948'},
+];
+const grid=document.getElementById('items');
+items.forEach(item=>{
+  const el=document.createElement('div');el.className='item-card';
+  el.innerHTML=`<div class="item-img" style="background:${item.bg}">
+    <span>${item.emoji}</span>
+    <span class="item-condition ${item.condClass}">${item.cond}</span>
+    <button class="item-fav">🤍</button>
+  </div>
+  <div class="item-info">
+    <div class="item-name">${item.name}</div>
+    <div class="item-meta">
+      <div class="item-price"><span>¥</span>${item.price}</div>
+      <div class="item-seller">
+        <div class="seller-dot" style="background:${item.sellerColor}">${item.seller[0]}</div>
+        ${item.seller}
+      </div>
+    </div>
+  </div>`;
+  el.querySelector('.item-fav').addEventListener('click',function(e){e.stopPropagation();this.textContent=this.textContent==='🤍'?'❤️':'🤍'});
+  grid.appendChild(el);
+});
+const hotItems=[
+  {emoji:'📱',name:'iPhone 14 Pro 128G 深空黑',info:'47人感兴趣 · 2小时前发布',price:'¥4,200',rank:1},
+  {emoji:'📷',name:'佳能 M50 Mark II 相机套机',info:'31人感兴趣 · 今天',price:'¥2,800',rank:2},
+  {emoji:'🎮',name:'Switch OLED 白色版+游戏',info:'28人感兴趣 · 昨天',price:'¥1,650',rank:3},
+  {emoji:'🛴',name:'小米电动滑板车 Pro 2',info:'19人感兴趣 · 3天前',price:'¥980',rank:4},
+  {emoji:'📚',name:'考研全套资料 2026版',info:'15人感兴趣 · 今天',price:'¥120',rank:5},
+];
+const hotList=document.getElementById('hot');
+hotItems.forEach(h=>{
+  const el=document.createElement('div');el.className='hot-item';
+  const rankClass=h.rank<=3?`rank-${h.rank}`:'rank-n';
+  el.innerHTML=`<div class="hot-rank ${rankClass}">${h.rank}</div>
+  <div class="hot-icon">${h.emoji}</div>
+  <div class="hot-meta"><div class="hot-name">${h.name}</div><div class="hot-info">${h.info}</div></div>
+  <div class="hot-price">${h.price}</div>`;
+  hotList.appendChild(el);
+});
+</script>
+</body>
+</html>

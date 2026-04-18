@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>虎啸 TigerRoar — AI 创作平台</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0b08;
+  --bg2:#141208;
+  --bg3:#1e1a0f;
+  --border:#2e2814;
+  --border2:#3d3520;
+  --text:#f0e8d0;
+  --muted:#8a7a50;
+  --accent:#e8a020;
+  --accent2:#f0c040;
+  --accent3:#d45a10;
+  --accent4:#fff0b0;
+  --glow:rgba(232,160,32,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+/* Animated background */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(232,160,32,0.1) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(212,90,16,0.07) 0%,transparent 50%);pointer-events:none;z-index:0}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;position:relative;z-index:1}
+/* Sidebar */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;display:flex;flex-direction:column}
+.logo{padding:0 24px 32px;display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:'DM Mono',monospace;color:#fff;font-weight:500}
+.logo-text{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.logo-text span{color:var(--accent)}
+.nav-section{padding:0 12px;margin-bottom:8px}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:1.5px;color:var(--muted);padding:0 12px;margin-bottom:6px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(232,160,32,0.15);color:var(--accent);font-weight:500}
+.nav-item .icon{width:16px;height:16px;opacity:0.8;font-size:14px}
+.nav-divider{height:1px;background:var(--border);margin:12px}
+.sidebar-bottom{margin-top:auto;padding:0 12px}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border)}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:500;color:var(--text)}
+.user-plan{font-size:10px;color:var(--muted)}
+.plan-badge{font-size:9px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;padding:1px 6px;border-radius:4px;font-weight:600;margin-left:4px}
+/* Main */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--bg)}
+.page-title{font-size:20px;font-weight:600;letter-spacing:-0.5px}
+.page-title span{color:var(--muted);font-weight:300}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.date-chip{font-size:12px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace}
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px}
+.btn-primary:hover{background:#6a58ef;transform:translateY(-1px)}
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+/* Stats row */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:0.06;transform:translate(20px,-20px)}
+.stat-card.c1::after{background:var(--accent)}
+.stat-card.c2::after{background:var(--accent2)}
+.stat-card.c3::after{background:var(--accent3)}
+.stat-card.c4::after{background:var(--accent4)}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px}
+.stat-value{font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:6px;font-family:'DM Mono',monospace}
+.stat-value.c1{color:var(--accent)}
+.stat-value.c2{color:var(--accent2)}
+.stat-value.c3{color:var(--accent3)}
+.stat-value.c4{color:var(--accent4)}
+.stat-change{font-size:11px;color:#4ecdc4;display:flex;align-items:center;gap:3px}
+.stat-change.down{color:var(--accent3)}
+/* Grid layout */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:13px;font-weight:600;color:var(--text)}
+.card-action{font-size:11px;color:var(--accent);cursor:pointer;font-weight:500}
+.card-action:hover{text-decoration:underline}
+/* Activity chart */
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;padding-top:8px}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:all 0.3s;cursor:pointer;position:relative}
+.bar:hover{filter:brightness(1.3)}
+.bar.words{background:linear-gradient(180deg,var(--accent),rgba(232,160,32,0.4))}
+.bar.ai{background:linear-gradient(180deg,var(--accent2),rgba(240,192,64,0.4))}
+.bar-label{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace}
+.chart-legend{display:flex;gap:14px;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+/* Writing tools */
+.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tool-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:flex-start;gap:12px}
+.tool-item:hover{border-color:var(--border2);background:rgba(232,160,32,0.08);transform:translateY(-1px)}
+.tool-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tool-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.tool-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.tool-count{font-size:9px;color:var(--accent);font-family:'DM Mono',monospace;margin-top:4px;font-weight:500}
+/* Recent docs */
+.doc-list{display:flex;flex-direction:column;gap:8px}
+.doc-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;transition:all 0.15s}
+.doc-item:hover{border-color:var(--border2)}
+.doc-type{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.doc-meta{flex:1;min-width:0}
+.doc-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-info{font-size:10px;color:var(--muted);margin-top:2px}
+.doc-score{font-size:11px;font-family:'DM Mono',monospace;font-weight:600}
+/* AI suggestions */
+.suggestion-list{display:flex;flex-direction:column;gap:8px}
+.suggestion{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s}
+.suggestion:hover{border-color:var(--accent);background:rgba(232,160,32,0.06)}
+.sug-label{font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-family:'DM Mono',monospace}
+.sug-text{font-size:12px;color:var(--text);line-height:1.5}
+.sug-meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.sug-tag{font-size:9px;background:rgba(232,160,32,0.15);color:var(--accent);padding:2px 7px;border-radius:4px;font-weight:500}
+.sug-score{font-size:10px;color:var(--accent2);font-family:'DM Mono',monospace}
+/* Usage ring */
+.usage-visual{display:flex;align-items:center;gap:18px;padding:4px 0}
+.ring-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.ring-pct{font-size:18px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;line-height:1}
+.ring-sub{font-size:8px;color:var(--muted);margin-top:1px}
+.usage-details{flex:1}
+.usage-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.usage-name{font-size:11px;color:var(--muted)}
+.usage-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;margin:0 10px}
+.usage-bar-fill{height:100%;border-radius:2px}
+.usage-val{font-size:10px;color:var(--text);font-family:'DM Mono',monospace;min-width:28px;text-align:right}
+/* Anim */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.stat-card{animation:fadeUp 0.4s ease both}
+.stat-card:nth-child(1){animation-delay:0.05s}
+.stat-card:nth-child(2){animation-delay:0.1s}
+.stat-card:nth-child(3){animation-delay:0.15s}
+.stat-card:nth-child(4){animation-delay:0.2s}
+.card{animation:fadeUp 0.4s ease both;animation-delay:0.25s}
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon" style="background:linear-gradient(135deg,#e8a020,#d45a10);font-size:18px">🐯</div>
+      <div class="logo-text">虎<span>啸</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">工作台</div>
+      <div class="nav-item active"><span class="icon">🐯</span> 概览</div>
+      <div class="nav-item"><span class="icon">✦</span> AI 创作</div>
+      <div class="nav-item"><span class="icon">◈</span> 作品库</div>
+      <div class="nav-item"><span class="icon">◎</span> 模板</div>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">
+      <div class="nav-label">分析</div>
+      <div class="nav-item"><span class="icon">▦</span> 数据报告</div>
+      <div class="nav-item"><span class="icon">◐</span> 用量统计</div>
+      <div class="nav-item"><span class="icon">⟡</span> 协作记录</div>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">
+      <div class="nav-label">设置</div>
+      <div class="nav-item"><span class="icon">◇</span> 账户设置</div>
+      <div class="nav-item"><span class="icon">⊕</span> 集成应用</div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="avatar">黄</div>
+        <div class="user-info">
+          <div class="user-name">黄寅 <span class="plan-badge">Pro</span></div>
+          <div class="user-plan">本月已用 68%</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title">创作台 <span>/ 本周概览</span></div>
+      <div class="topbar-right">
+        <div class="date-chip">2026-04-18</div>
+        <button class="btn-primary" onclick="startWriting()">🐯 开始创作</button>
+      </div>
+    </div>
+    <div class="content">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card c1">
+          <div class="stat-label">本周字数</div>
+          <div class="stat-value c1" id="words">12,840</div>
+          <div class="stat-change">↑ 23% 较上周</div>
+        </div>
+        <div class="stat-card c2">
+          <div class="stat-label">AI 生成次数</div>
+          <div class="stat-value c2" id="ai-calls">347</div>
+          <div class="stat-change">↑ 15% 较上周</div>
+        </div>
+        <div class="stat-card c3">
+          <div class="stat-label">完成文档</div>
+          <div class="stat-value c3">28</div>
+          <div class="stat-change">↑ 8 篇较上周</div>
+        </div>
+        <div class="stat-card c4">
+          <div class="stat-label">平均质量分</div>
+          <div class="stat-value c4">92.4</div>
+          <div class="stat-change">↑ 3.2 分提升</div>
+        </div>
+      </div>
+      <!-- Row 1 -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">写作活跃度（近7天）</div>
+            <div class="card-action" onclick="">查看详情 →</div>
+          </div>
+          <div class="chart-bars" id="chart"></div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>原创字数</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div>AI 辅助</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">本月用量</div>
+          </div>
+          <div class="usage-visual">
+            <div class="ring-wrap">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#1a1a24" stroke-width="8"/>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="url(#grad)" stroke-width="8" stroke-dasharray="201" stroke-dashoffset="64" stroke-linecap="round"/>
+                <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#e8a020"/><stop offset="100%" style="stop-color:#f0c040"/></linearGradient></defs>
+              </svg>
+              <div class="ring-center"><div class="ring-pct">68%</div><div class="ring-sub">已使用</div></div>
+            </div>
+            <div class="usage-details">
+              <div class="usage-row">
+                <div class="usage-name">字数</div>
+                <div class="usage-bar-wrap"><div class="usage-bar-fill" style="width:68%;background:var(--accent)"></div></div>
+                <div class="usage-val">68k</div>
+              </div>
+              <div class="usage-row">
+                <div class="usage-name">AI次数</div>
+                <div class="usage-bar-wrap"><div class="usage-bar-fill" style="width:55%;background:var(--accent2)"></div></div>
+                <div class="usage-val">550</div>
+              </div>
+              <div class="usage-row">
+                <div class="usage-name">存储</div>
+                <div class="usage-bar-wrap"><div class="usage-bar-fill" style="width:30%;background:var(--accent3)"></div></div>
+                <div class="usage-val">1.5G</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Row 2 -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">最近文档</div>
+            <div class="card-action">全部文档</div>
+          </div>
+          <div class="doc-list" id="docs"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">AI 智能建议</div>
+            <div class="card-action">刷新</div>
+          </div>
+          <div class="suggestion-list" id="suggestions"></div>
+        </div>
+      </div>
+      <!-- Row 3 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">写作工具</div>
+          <div class="card-action">查看全部工具</div>
+        </div>
+        <div class="tools-grid" id="tools"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+// Chart
+const days=['周一','周二','周三','周四','周五','周六','周日'];
+const wData=[1800,2400,1200,3200,2800,900,540];
+const aData=[600,1100,400,1800,1400,350,190];
+const maxW=Math.max(...wData,...aData);
+const chart=document.getElementById('chart');
+days.forEach((d,i)=>{
+  const g=document.createElement('div');
+  g.className='bar-group';
+  const wH=Math.round(wData[i]/maxW*68);
+  const aH=Math.round(aData[i]/maxW*68);
+  g.innerHTML=`<div style="display:flex;gap:2px;align-items:flex-end;height:68px">
+    <div class="bar words" style="width:12px;height:${wH}px" title="${d} 原创${wData[i]}字"></div>
+    <div class="bar ai" style="width:12px;height:${aH}px" title="${d} AI${aData[i]}字"></div>
+  </div>
+  <div class="bar-label">${d}</div>`;
+  chart.appendChild(g);
+});
+// Docs
+const docs=[
+  {icon:'📝',bg:'rgba(124,106,255,0.15)',name:'产品需求文档 v2.3 — 智能推荐模块',info:'2小时前 · 3,240字',score:'96',color:'#7c6aff'},
+  {icon:'📊',bg:'rgba(78,205,196,0.15)',name:'Q2 用户增长分析报告',info:'昨天 · 5,180字',score:'91',color:'#4ecdc4'},
+  {icon:'✉️',bg:'rgba(255,107,157,0.15)',name:'投资人沟通邮件 · 第三轮路演',info:'昨天 · 820字',score:'88',color:'#ff6b9d'},
+  {icon:'📋',bg:'rgba(255,209,102,0.15)',name:'功能规划 OKR — 2026 Q2',info:'3天前 · 1,650字',score:'94',color:'#ffd166'},
+];
+const docList=document.getElementById('docs');
+docs.forEach(d=>{
+  const el=document.createElement('div');el.className='doc-item';
+  el.innerHTML=`<div class="doc-type" style="background:${d.bg}">${d.icon}</div>
+  <div class="doc-meta"><div class="doc-name">${d.name}</div><div class="doc-info">${d.info}</div></div>
+  <div class="doc-score" style="color:${d.color}">${d.score}</div>`;
+  docList.appendChild(el);
+});
+// Suggestions
+const sugs=[
+  {label:'结构优化',text:'建议在第三章补充数据支撑，当前论据较弱，可参考 Q1 转化率数据。',tag:'PRD',score:'+12分'},
+  {label:'表达润色',text:'「用户痛点」段落语气偏平，建议改用场景化叙述，代入感更强。',tag:'文案',score:'+8分'},
+  {label:'逻辑补充',text:'商业闭环分析缺少变现路径，建议补充订阅 vs 广告的对比分析。',tag:'报告',score:'+15分'},
+];
+const sugList=document.getElementById('suggestions');
+sugs.forEach(s=>{
+  const el=document.createElement('div');el.className='suggestion';
+  el.innerHTML=`<div class="sug-label">${s.label}</div><div class="sug-text">${s.text}</div>
+  <div class="sug-meta"><span class="sug-tag">${s.tag}</span><span class="sug-score">${s.score}</span></div>`;
+  sugList.appendChild(el);
+});
+// Tools
+const tools=[
+  {icon:'✦',bg:'rgba(124,106,255,0.15)',name:'AI 续写',desc:'基于上下文智能续写，保持风格一致',count:'本月使用 142 次'},
+  {icon:'◎',bg:'rgba(78,205,196,0.15)',name:'语气调整',desc:'一键切换正式/轻松/学术等写作风格',count:'本月使用 89 次'},
+  {icon:'◈',bg:'rgba(255,107,157,0.15)',name:'摘要提炼',desc:'自动生成文章摘要和核心要点',count:'本月使用 67 次'},
+  {icon:'▦',bg:'rgba(255,209,102,0.15)',name:'数据可视化',desc:'将数字洞察转化为图表描述文字',count:'本月使用 43 次'},
+];
+const toolsGrid=document.getElementById('tools');
+tools.forEach(t=>{
+  const el=document.createElement('div');el.className='tool-item';
+  el.innerHTML=`<div class="tool-icon" style="background:${t.bg}">${t.icon}</div>
+  <div><div class="tool-name">${t.name}</div><div class="tool-desc">${t.desc}</div><div class="tool-count">${t.count}</div></div>`;
+  toolsGrid.appendChild(el);
+});
+function startWriting(){alert('🐯 虎啸 AI 创作模式启动！\n（产品原型展示 · 设计：黄寅）');}
+</script>
+</body>
+</html>
